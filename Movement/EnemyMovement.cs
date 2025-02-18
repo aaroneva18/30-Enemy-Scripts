@@ -3,22 +3,27 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class EnemyMovement : Movement
-{
-    private NavMeshAgent navMeshAgent;
-    private GameObject player;
+public class EnemyMovement : Movement {
 
-    // Start is called before the first frame update
+    [SerializeField] private float distanceToPlayer = 0;
+    [SerializeField] private Transform destination;
+
+    private NavMeshAgent navMeshAgent;
+
+    private void Awake() {
+        SetDefaultState();
+    }
+
     void Start()
     {
         
     }
 
-    // Update is called once per frame
     void Update()
     {
         
     }
+
     public override float CalculateCurrentSpeed() {
         throw new System.NotImplementedException();
     }
@@ -32,12 +37,17 @@ public class EnemyMovement : Movement
     }
 
     public override void Move() {
-        throw new System.NotImplementedException();
+        if (destination == null) { 
+            navMeshAgent.isStopped = true;
+            return; 
+        }
+        navMeshAgent.isStopped = false;
+        navMeshAgent.SetDestination(destination.position);
     }
 
-
-    public void DetectPlayerByCollisionRadious() {
-        
+    public void SetDestination(Transform desiredDestination) {
+        destination = desiredDestination;
+        Move();
     }
 
 
@@ -48,4 +58,5 @@ public class EnemyMovement : Movement
             Debug.LogError(e);
         }
     }
+
 }
