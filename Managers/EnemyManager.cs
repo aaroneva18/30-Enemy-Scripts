@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class EnemyManager : CharacterManager
 {
@@ -13,6 +15,12 @@ public class EnemyManager : CharacterManager
     [SerializeField] private LayerMask playerLayerMask;
     [SerializeField] private Transform initialEnemyPosition;
 
+    public Sprite plantSprite;
+
+    public int price;
+    public Image icon;
+    public TextMeshProUGUI priceText;
+
     private EnemyMovement enemyMovement;
 
     private void Awake() {
@@ -22,6 +30,13 @@ public class EnemyManager : CharacterManager
     void Start()
     {
         KnowWherePlayerIs();
+
+        bool isIconEnable = plantSprite;
+        icon.SetEnabled(isIconEnable);
+        if (isIconEnable) {
+            icon.sprite = plantSprite;
+            priceText.text = price.ToString();
+        }
     }
 
     void Update()
@@ -32,16 +47,20 @@ public class EnemyManager : CharacterManager
 
     void FixedUpdate() {
         //implement states
+        ChasePlayer();
+    }
+
+    private void ChasePlayer() {
         if (isEnemyCloseToPlayer) {
-            if (isChasingPlayer) { 
+            if (isChasingPlayer) {
                 enemyMovement.Move();
-                return; 
+                return;
             }
             enemyMovement.SetDestination(player.transform);
             isChasingPlayer = true;
         }
 
-        if (DistanceToPlayer() > radiusDetection) { 
+        if (DistanceToPlayer() > radiusDetection) {
             enemyMovement.TeleportTo(initialEnemyPosition);
             enemyMovement.SetDestination(null);
             isChasingPlayer = false;
