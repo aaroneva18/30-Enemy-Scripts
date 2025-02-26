@@ -3,6 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+public enum EnemyPorpuses {
+    Patrol,
+    Chase,
+    Attack,
+    Hide
+}
+
 public class EnemyMovement : Movement {
 
     [SerializeField] private float distanceToPlayer = 0;
@@ -24,6 +31,8 @@ public class EnemyMovement : Movement {
         
     }
 
+    public Transform GetDestination() { return destination; }
+
     public override float CalculateCurrentSpeed() {
         throw new System.NotImplementedException();
     }
@@ -39,17 +48,25 @@ public class EnemyMovement : Movement {
     public override void Move() {
         if (destination == null) { 
             navMeshAgent.isStopped = true;
+            navMeshAgent.SetDestination(SearchForPlayerPosition().position);
             return; 
         }
         navMeshAgent.isStopped = false;
         navMeshAgent.SetDestination(destination.position);
     }
 
-    public void SetDestination(Transform desiredDestination) {
-        destination = desiredDestination;
-        Move();
+    private Transform SearchForPlayerPosition() {
+        destination = GameObject.FindGameObjectWithTag("Player").transform;
+        string destinationisSet = destination ? "Destination is set" : "Destination is not set";
+        Debug.Log(destinationisSet);
+        return destination;
+
     }
 
+    public void SetDesination() {
+        destination = null;
+        
+    }
 
     public override void SetDefaultState() {
         try {
