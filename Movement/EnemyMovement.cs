@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,16 +7,20 @@ using UnityEngine.AI;
 public enum EnemyPorpuses {
     Patrol,
     Chase,
-    Attack,
     Hide
 }
+
 
 public class EnemyMovement : Movement {
 
     [SerializeField] private float distanceToPlayer = 0;
     [SerializeField] private Transform destination;
+    [SerializeField] private EnemyPorpuses currentPorpuse;
+    
 
+    private Dictionary<Func<bool>, EnemyPorpuses> PorpusesRules;
     private NavMeshAgent navMeshAgent;
+    private EnemyManager enemyManager;
 
     private void Awake() {
         SetDefaultState();
@@ -23,12 +28,12 @@ public class EnemyMovement : Movement {
 
     void Start()
     {
-        
+        SetEnemyPorpusesRules();
     }
 
     void Update()
     {
-        
+        SetEnemyPorpuse();
     }
 
     public Transform GetDestination() { return destination; }
@@ -54,6 +59,11 @@ public class EnemyMovement : Movement {
         navMeshAgent.isStopped = false;
         navMeshAgent.SetDestination(destination.position);
     }
+    public void SetDesination() {
+
+        //hacer un diccionario de propositos y de destinos.
+        
+    }
 
     private Transform SearchForPlayerPosition() {
         destination = GameObject.FindGameObjectWithTag("Player").transform;
@@ -63,14 +73,29 @@ public class EnemyMovement : Movement {
 
     }
 
-    public void SetDesination() {
-        destination = null;
-        
+    private void SetEnemyPorpusesRules() {
+        PorpusesRules = new Dictionary<Func<bool>, EnemyPorpuses>() 
+        {
+            {() => enemyManager.GetIsEnemyCloseToPlayer, EnemyPorpuses.Chase },
+            {() => distanceToPlayer > 10, EnemyPorpuses.Hide },
+            {() => true, EnemyPorpuses.Patrol} //default state
+
+        };
+    }
+
+    private void SetEnemyPorpuse() {
+        foreach (var rule in PorpusesRules) {
+            if (rule.Key()) {
+                currentPorpuse = rule.Value;
+                return;
+            }
+        }
     }
 
     public override void SetDefaultState() {
         try {
             navMeshAgent = GetComponent<NavMeshAgent>();
+            enemyManager = GetComponent<EnemyManager>();
         } catch (System.Exception e) {
             Debug.LogError(e);
         }
