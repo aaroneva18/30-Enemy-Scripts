@@ -12,8 +12,8 @@ public class EnemyStateMachine : StateMachine
     private void Start() {
         WalkState walkState = new WalkState(enemyMovement);
         IddleState iddleState = new IddleState(enemyMovement);
-        AddTransition(iddleState, walkState, () => enemyMovement.GetDestination());
-        AddTransition(walkState, iddleState, () => enemyMovement.GetDestination() && !enemyMovement.CheckIsMoving());
+        AddTransition(iddleState, walkState, () => enemyMovement.EnemyHasDestination);
+        AddTransition(walkState, iddleState, () => !enemyMovement.EnemyHasDestination && !enemyMovement.CheckIsMoving());
         SetState(iddleState);
     }
 
