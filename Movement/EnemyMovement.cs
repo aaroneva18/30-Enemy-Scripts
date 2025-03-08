@@ -17,8 +17,8 @@ public class EnemyMovement : Movement {
     [SerializeField] private Transform currentEnemyDestination;
     [SerializeField] private EnemyPorpuses currentPorpuse;
     [SerializeField] private bool enemyHasDestination = false;
-    [SerializeField] List<Transform> PatrolPosition;
-    [SerializeField] List<Transform> HidePosition;
+    [SerializeField] List<Transform> PatrolPositions;
+    [SerializeField] List<Transform> HidePositions;
 
 
     private Dictionary<Func<bool>, EnemyPorpuses> PorpusesRules;
@@ -80,14 +80,38 @@ public class EnemyMovement : Movement {
     }
 
     private Transform FindCurrentPatrolPosition() {
-        foreach (var temp_position in PatrolPosition) {
-            set
+        float NearnestDistance = 0;
+        float CurrentDistance = 0;
+        List<Transform> OrdererPatrolPositions = new List<Transform>();
+        NearnestDistance = Vector3.Distance(transform.position, PatrolPositions[0].position);
+        for (int i = 0; i < PatrolPositions.Count; i++) {
+            CurrentDistance = Vector3.Distance(transform.position, PatrolPositions[i].position);
+            if (CurrentDistance <= NearnestDistance) {
+                OrdererPatrolPositions.Add(PatrolPositions[i]);
+                NearnestDistance = CurrentDistance;
+            }
         }
-        return null;
+        int finalCheckPoint = OrdererPatrolPositions.Count - 1;
+        return OrdererPatrolPositions[finalCheckPoint];
+
     }
 
+
+    //Mejorar este metodo meterlo en el character manager 
     private Transform FindCurrentHidePosition() {
-        return null;
+        float NearnestDistance = 0;
+        float CurrentDistance = 0;
+        List<Transform> OrdererHidePosition = new List<Transform>();
+        NearnestDistance = Vector3.Distance(transform.position, HidePositions[0].position);
+        for (int i = 0; i < PatrolPositions.Count; i++) {
+            CurrentDistance = Vector3.Distance(transform.position, PatrolPositions[i].position);
+            if (CurrentDistance <= NearnestDistance) {
+                OrdererHidePosition.Add(PatrolPositions[i]);
+                NearnestDistance = CurrentDistance;
+            }
+        }
+        int finalCheckPoint = OrdererHidePosition.Count - 1;
+        return OrdererHidePosition[finalCheckPoint];
     }
 
     private Transform FindPlayerPosition() {
